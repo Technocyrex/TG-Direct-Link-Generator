@@ -17,9 +17,6 @@ class Var(object):
     PORT = int(8080)
     BIND_ADDRESS = str("0.0.0.0")
     PING_INTERVAL = int("1200")  # 20 minutes
-    HAS_SSL = False
-    #NO_PORT = ("NO_P
-    #NO_PORT = True if str(NO_PORT).lower() == "true" else False
 
     ON_HEROKU = False
     URL = f"http://0.0.0.0:8080"
