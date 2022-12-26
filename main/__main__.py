@@ -1,89 +1,31 @@
 # This file is a part of TG-Direct-Link-Generator
 
-import sys
-import asyncio
-import logging
-from .vars import Var
-from aiohttp import web
-from pyrogram import idle
-from main import utils
-from main import StreamBot
-from main.server import web_server
-from main.bot.clients import initialize_clients
+from os import environ
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    datefmt="%d/%m/%Y %H:%M:%S",
-    format='[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(stream=sys.stdout),
-              logging.FileHandler("streambot.log", mode="a", encoding="utf-8")],)
+class Var(object):
+    MULTI_CLIENT = False
+    API_ID = int("3523181")
+    API_HASH = str('78c9a165ba54798fb5e36019397d44ce')
+    BOT_TOKEN = str("1609351476:AAGYWE0_jHSDYtPC1uA6MwPvs42spuidWjc")
+    SLEEP_THRESHOLD = int('60')
+    WORKERS = int("8") 
+    BIN_CHANNEL = int("1001859320064")  # you NEED to use a CHANNEL when you're using MULTI_CLIENT
+    PORT = int(8080)
+    BIND_ADDRESS = str("0.0.0.0")
+    PING_INTERVAL = int("1200")  # 20 minutes
+    HAS_SSL = False
+    #NO_PORT = ("NO_P
+    #NO_PORT = True if str(NO_PORT).lower() == "true" else False
 
-logging.getLogger("aiohttp").setLevel(logging.ERROR)
-logging.getLogger("pyrogram").setLevel(logging.ERROR)
-logging.getLogger("aiohttp.web").setLevel(logging.ERROR)
+    ON_HEROKU = False
+    URL = f"http://0.0.0.0:8080"
 
-server = web.AppRunner(web_server())
+    UPDATES_CHANNEL = "null"
+    OWNER_ID = 1024288582
 
-if sys.version_info[1] > 9:
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-else:
-    loop = asyncio.get_event_loop()
-
-async def start_services():
-    print()
-    print("-------------------- Initializing Telegram Bot --------------------")
-    await StreamBot.start()
-    bot_info = await StreamBot.get_me()
-    StreamBot.username = bot_info.username
-    print("------------------------------ DONE ------------------------------")
-    print()
-    print(
-        "---------------------- Initializing Clients ----------------------"
-    )
-    await initialize_clients()
-    print("------------------------------ DONE ------------------------------")
-    if Var.ON_HEROKU:
-        print("------------------ Starting Keep Alive Service ------------------")
-        print()
-        asyncio.create_task(utils.ping_server())
-    print("--------------------- Initalizing Web Server ---------------------")
-    await server.setup()
-    bind_address = "0.0.0.0" if Var.ON_HEROKU else Var.BIND_ADDRESS
-    await web.TCPSite(server, bind_address, Var.PORT).start()
-    print("------------------------------ DONE ------------------------------")
-    print()
-    print("------------------------- Service Started -------------------------")
-    print("                        bot =>> {}".format(bot_info.first_name))
-    if bot_info.dc_id:
-        print("                        DC ID =>> {}".format(str(bot_info.dc_id)))
-    print("                        server ip =>> {}".format(bind_address, Var.PORT))
-    if Var.ON_HEROKU:
-        print("                        app running on =>> {}".format(Var.FQDN))
-    print("------------------------------------------------------------------")
-    print()
-    print("""
- _____________________________________________   
-|                                             |  
-|          Deployed Successfully              |  
-|              Join @TechZBots                |
-|_____________________________________________|
-    """)
-    await idle()
-
-async def cleanup():
-    await server.cleanup()
-    await StreamBot.stop()
-
-if __name__ == "__main__":
-    try:
-        loop.run_until_complete(start_services())
-    except KeyboardInterrupt:
-        pass
-    except Exception as err:
-        logging.error(err.with_traceback(None))
-    finally:
-        loop.run_until_complete(cleanup())
-        loop.stop()
-        print("------------------------ Stopped Services ------------------------")
+    BANNED_CHANNELS = list(set(int(x) for x in str(("-1001296894100")).split()))
+    BANNED_USERS = list(set(int(x) for x in str(("5287015877")).split()))
